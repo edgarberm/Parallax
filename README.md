@@ -10,6 +10,6 @@ var parallax = new Parallax( document.getElementById( 'parallax-container' ), {
 		axis: 'both',
 		scope: 'global',
 		detect: 'mousemove'
-        } );
+} );
 
 ```
