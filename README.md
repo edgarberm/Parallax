@@ -5,11 +5,11 @@ Parallax.js is a lightweight and simple parallax effect. Simple to use and works
 ##Usage
 ```javascript
 var parallax = new Parallax( document.getElementById( 'parallax-container' ), {
-			className: 'parallax',
-			power: .1,
-			axis: 'both',
-			scope: 'global',
-			detect: 'mousemove'
-} );
+		className: 'parallax',
+		power: .1,
+		axis: 'both',
+		scope: 'global',
+		detect: 'mousemove'
+        } );
 
 ```
