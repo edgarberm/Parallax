@@ -29,6 +29,7 @@
 
 
 
+
 // CONSTRUCTOR
 
 function Parallax ( container, options ) {
@@ -51,7 +52,11 @@ function Parallax ( container, options ) {
 	this.capture = null;
 	this.el = [];
 
+	this.windowHalfWidth = window.innerWidth * .5;
+	this.windowHalfHeight = window.innerHeight * .5;
+
 	window.addEventListener( 'DOMContentLoaded', this._load.bind( this ), false );
+	window.addEventListener( 'resize', this._resize.bind( this ), false );
 
 };
 
@@ -61,8 +66,6 @@ function Parallax ( container, options ) {
 // LOAD EVENT
 
 Parallax.prototype._load = function () {
-
-	var strength = this.o.power / 10;
 
 	if ( this.o.detect === 'scroll' ) {
 		this.capture = window;
@@ -102,17 +105,19 @@ Parallax.prototype.handleEvent = function ( event ) {
 	[].forEach.call( this.el, function ( item ) {
 
 		var offsetX = 0, 
-			offsetY = 0;
+			offsetY = 0,
+			power = item.dataset.power || this.o.power;
+
+		console.log( power );
 		
 		if ( that.o.axis === 'x' || that.o.axis === 'both' ) {
-			offsetX = ( xaxis - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * that.o.power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
+			offsetX = ( xaxis - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
 		} 
 
 		if ( that.o.axis === 'y' || that.o.axis === 'both' ) {
-			offsetY = ( yaxis - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * that.o.power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
+			offsetY = ( yaxis - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
 		} 
 
-		// Optimizada la animación con transformaciones CSS
 		that._setTransform( item, 'transform', 'translate3d( ' + offsetX + 'px, ' + offsetY + 'px, 0 )' );
 
 		counter ++;
@@ -136,6 +141,17 @@ Parallax.prototype._setTransform = function ( element, property, value ) {
 
 };
 
+
+
+
+// RESIZE
+
+Parallax.prototype._resize = function ( event ) {
+	
+	this.windowHalfWidth = window.innerWidth * .5;
+	this.windowHalfHeight = window.innerHeight * .5;
+	
+};
 
 
 // MOBILE DETECT
@@ -167,4 +183,6 @@ Parallax.prototype._extend = function ( opt, src ) {
 
 	return opt;
 };
+
+
 
