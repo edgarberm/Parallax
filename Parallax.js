@@ -29,7 +29,6 @@
 
 
 
-
 // CONSTRUCTOR
 
 function Parallax ( container, options ) {
@@ -46,6 +45,7 @@ function Parallax ( container, options ) {
 	this.o = defaults;
 
 	console.info( this.o );
+	console.info( this._isMobile( ) );
 
 	this.container = container;
 	this.capture = null;
@@ -113,7 +113,7 @@ Parallax.prototype.handleEvent = function ( event ) {
 		} 
 
 		// Optimizada la animación con transformaciones CSS
-		item.style.webkitTransform = 'translate3d( ' + offsetX + 'px, ' + offsetY + 'px, 0 )';
+		that._setTransform( item, 'transform', 'translate3d( ' + offsetX + 'px, ' + offsetY + 'px, 0 )' );
 
 		counter ++;
 
@@ -124,11 +124,29 @@ Parallax.prototype.handleEvent = function ( event ) {
 
 
 
+// SET TRANSFORM
+
+Parallax.prototype._setTransform = function ( element, property, value ) {
+	
+	element.style[ "webkit" + property ] = value;
+	element.style[ "moz" + property ] = value;
+	element.style[ "ms" + property ] = value;
+	element.style[ "o" + property ] = value;
+	element.style[ property ] = value;
+
+};
+
+
+
 // MOBILE DETECT
 
-Parallax.prototype._isMobile = function( agent ) {
+Parallax.prototype._isMobile = function ( agent ) {
 
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test( agent );
+	if ( navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i) ) {
+		return true;
+	} else {
+		return false;
+	}
 	
 };
 
@@ -136,7 +154,7 @@ Parallax.prototype._isMobile = function( agent ) {
 
 // EXTEND
 
-Parallax.prototype._extend = function( opt, src ) {
+Parallax.prototype._extend = function ( opt, src ) {
 	
 	for ( var p in src ) {
 		if ( src[ p ] && src[ p ].constructor && src[ p ].constructor === Object ) {
