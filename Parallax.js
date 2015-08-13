@@ -46,7 +46,6 @@ function Parallax ( container, options ) {
 	this.o = defaults;
 
 	console.info( this.o );
-	console.info( this._isMobile( ) );
 
 	this.container = container;
 	this.capture = null;
