@@ -106,8 +106,6 @@ Parallax.prototype.handleEvent = function ( event ) {
 		var offsetX = 0, 
 			offsetY = 0,
 			power = item.dataset.power || this.o.power;
-
-		console.log( power );
 		
 		if ( that.o.axis === 'x' || that.o.axis === 'both' ) {
 			offsetX = ( xaxis - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
