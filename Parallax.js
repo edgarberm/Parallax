@@ -130,10 +130,10 @@ Parallax.prototype.handleEvent = function ( event ) {
 
 Parallax.prototype._setTransform = function ( element, property, value ) {
 	
-	element.style[ "webkit" + property ] = value;
-	element.style[ "moz" + property ] = value;
-	element.style[ "ms" + property ] = value;
-	element.style[ "o" + property ] = value;
+	element.style[ "-webkit-" + property ] = value;
+	element.style[ "-moz-" + property ] = value;
+	element.style[ "-ms-" + property ] = value;
+	element.style[ "-o-" + property ] = value;
 	element.style[ property ] = value;
 
 };
