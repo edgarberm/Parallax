@@ -130,7 +130,7 @@ Parallax.prototype.handleEvent = function ( event ) {
 
 		if ( that.o.allowrotation ) {
 			rotateX = ( ( axisX / window.innerWidth ) - 0.5 ) * 5;
-            rotateY = ( ( axisY / window.innerHeight ) - 0.5 ) * 5;
+			rotateY = ( ( axisY / window.innerHeight ) - 0.5 ) * 5;
 		}
 
 		item.style[ that.transformPrefix ] = 'matrix( 1, 0, 0, 1, ' + offsetX + ', ' + offsetY + ' )';
