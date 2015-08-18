@@ -38,6 +38,8 @@ function Parallax ( container, options ) {
 		className: 'parallax',
 		power: .5,
 		axis: 'x',
+		allowrotation: true,
+		orientation: true,
 		scope: 'global',
 		detect: 'mousemove'
 	}
@@ -46,10 +48,13 @@ function Parallax ( container, options ) {
 	this.o = defaults;
 
 	console.info( this.o );
+	console.info( this._isMobile( ) );
 
 	this.container = container;
 	this.capture = null;
 	this.el = [];
+
+	this.raf;
 
 	this.windowHalfWidth = window.innerWidth * .5;
 	this.windowHalfHeight = window.innerHeight * .5;
@@ -74,6 +79,8 @@ Parallax.prototype._load = function () {
 		this.capture = this.container;
 	}
 
+	this.transformPrefix = this._getPrefix( [ 'transform', '-ms-transform', '-moz-transform', '-webkit-transform', '-o-transform' ] );
+
 	this.capture.addEventListener( this.o.detect, this, false );
 
 	this.el = document.getElementsByClassName( this.o.className );
@@ -87,17 +94,23 @@ Parallax.prototype._load = function () {
 
 Parallax.prototype.handleEvent = function ( event ) { 
 
-	var that = this;
-	var counter = 1;
-	var scrollLeft = ( window.pageXOffset !== undefined ) ? window.pageXOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollLeft;
-	var scrollTop = ( window.pageYOffset !== undefined ) ? window.pageYOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollTop;
+	event.preventDefault();
+
+	var that = this,
+		counter = 1,
+		scrollLeft = ( window.pageXOffset !== undefined ) ? window.pageXOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollLeft,
+		scrollTop = ( window.pageYOffset !== undefined ) ? window.pageYOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollTop,
+		axisX = 0, 
+		axisY = 0,
+		rotateX = 0, 
+		rotateY = 0;
 	
 	if ( this.o.detect === 'scroll' ) {
-		var xaxis = scrollLeft + window.innerWidth * .5;
-		var yaxis = scrollTop + window.innerHeight * .5;
+		axisX = scrollLeft + window.innerWidth * .5;
+		axisY = scrollTop + window.innerHeight * .5;
 	} else {
-		var xaxis = event.pageX;
-		var yaxis = event.pageY;
+		axisX = event.pageX;
+		axisY = event.pageY;
 	}
 	
 	
@@ -108,14 +121,19 @@ Parallax.prototype.handleEvent = function ( event ) {
 			power = item.dataset.power || this.o.power;
 		
 		if ( that.o.axis === 'x' || that.o.axis === 'both' ) {
-			offsetX = ( xaxis - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
+			offsetX = ( axisX - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
 		} 
 
 		if ( that.o.axis === 'y' || that.o.axis === 'both' ) {
-			offsetY = ( yaxis - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
-		} 
+			offsetY = ( axisY - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
+		}
 
-		that._setTransform( item, 'transform', 'translate3d( ' + offsetX + 'px, ' + offsetY + 'px, 0 )' );
+		if ( that.o.allowrotation ) {
+			rotateX = ( ( axisX / window.innerWidth ) - 0.5 ) * 5;
+            rotateY = ( ( axisY / window.innerHeight ) - 0.5 ) * 5;
+		}
+
+		item.style[ that.transformPrefix ] = 'matrix( 1, 0, 0, 1, ' + offsetX + ', ' + offsetY + ' )';
 
 		counter ++;
 
@@ -126,15 +144,25 @@ Parallax.prototype.handleEvent = function ( event ) {
 
 
 
-// SET TRANSFORM
+// GET PREFIX
+// @prefixex { Array }
 
-Parallax.prototype._setTransform = function ( element, property, value ) {
+Parallax.prototype._getPrefix = function ( prefixes ) {
 	
-	element.style[ "-webkit-" + property ] = value;
-	element.style[ "-moz-" + property ] = value;
-	element.style[ "-ms-" + property ] = value;
-	element.style[ "-o-" + property ] = value;
-	element.style[ property ] = value;
+	var tmp = document.createElement( 'div' ),
+	    result = '';
+
+	for ( var i = 0; i < prefixes.length; i++ ) {
+		
+		if ( typeof tmp.style[ prefixes[ i ] ] ) {
+			result = prefixes[ i ];
+			break;
+		} else {
+			result = null;
+		}
+	}
+	
+	return result;
 
 };
 
