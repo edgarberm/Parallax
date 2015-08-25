@@ -38,17 +38,12 @@ function Parallax ( container, options ) {
 		className: 'parallax',
 		power: .5,
 		axis: 'x',
-		allowrotation: true,
-		orientation: true,
 		scope: 'global',
 		detect: 'mousemove'
 	}
 
 	this._extend( defaults, options );
 	this.o = defaults;
-
-	console.info( this.o );
-	console.info( this._isMobile( ) );
 
 	this.container = container;
 	this.capture = null;
@@ -83,6 +78,14 @@ Parallax.prototype._load = function () {
 
 	this.capture.addEventListener( this.o.detect, this, false );
 
+	if ( this._isMobile() ) {
+		if ( window.DeviceMotionEvent ) {
+			window.addEventListener( 'ondevicemotion', this );
+		} else {
+			alert( "Sorry, your browser doesn't support Device Orientation" );
+		}
+	}
+
 	this.el = document.getElementsByClassName( this.o.className );
 
 };
@@ -108,6 +111,9 @@ Parallax.prototype.handleEvent = function ( event ) {
 	if ( this.o.detect === 'scroll' ) {
 		axisX = scrollLeft + window.innerWidth * .5;
 		axisY = scrollTop + window.innerHeight * .5;
+	} else if ( this._isMobile() ) {
+		axisY = event.accelerationIncludingGravity.y * 3;
+		axisX = event.accelerationIncludingGravity.x * 3;
 	} else {
 		axisX = event.pageX;
 		axisY = event.pageY;
@@ -128,12 +134,10 @@ Parallax.prototype.handleEvent = function ( event ) {
 			offsetY = ( axisY - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
 		}
 
-		if ( that.o.allowrotation ) {
-			rotateX = ( ( axisX / window.innerWidth ) - 0.5 ) * 5;
-			rotateY = ( ( axisY / window.innerHeight ) - 0.5 ) * 5;
-		}
-
-		item.style[ that.transformPrefix ] = 'matrix( 1, 0, 0, 1, ' + offsetX + ', ' + offsetY + ' )';
+		
+		// matrix3d(a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1)
+		// matrix3d( 1,	0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+		item.style[ that.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + offsetX + ', ' + offsetY + ', 0, 1 )';
 
 		counter ++;
 
@@ -150,7 +154,7 @@ Parallax.prototype.handleEvent = function ( event ) {
 Parallax.prototype._getPrefix = function ( prefixes ) {
 	
 	var tmp = document.createElement( 'div' ),
-	    result = '';
+		result = '';
 
 	for ( var i = 0; i < prefixes.length; i++ ) {
 		
