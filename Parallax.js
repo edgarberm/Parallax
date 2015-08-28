@@ -118,8 +118,8 @@ Parallax.prototype._run = function ( ) {
 	
 	this.pointer.cx += ( this.pointer.x - this.pointer.cx ) / 10;
 	this.pointer.cy += ( this.pointer.y - this.pointer.cy ) / 10;
-	vx = -( ( this.windowWidth * .5 ) - Math.max( 15, Math.min( this.pointer.cx, this.windowWidth - 15 ) ) ) * .5;
-	vy = -( ( this.windowHeight * .5 ) - Math.max( 0, Math.min( this.pointer.cy,this.windowHeight - 5 ) ) ) / 4.75;
+	vx = -( ( this.windowWidth * .5 ) - Math.max( 15, Math.min( this.pointer.cx, this.windowWidth - 15 ) ) );
+	vy = -( ( this.windowHeight * .5 ) - Math.max( 0, Math.min( this.pointer.cy,this.windowHeight - 5 ) ) );
 	
 	
 	[].forEach.call( this.el, function ( item ) {
