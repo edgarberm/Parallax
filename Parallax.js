@@ -1,9 +1,9 @@
 /**********************************************************************************
  *
- * Parallax.js: Parallax effects
+ * Parallax.js: Mouse parallax effect
  *
- * Parallax.js is a lightweight and simple parallax effect. Simple to use and works 
- * with the mouse, with the scroll and reacts to the orientation of your smart device.
+ * Parallax.js is a lightweight and simple mouse parallax effect. Simple to use 
+ * and works with the mouse and soon reacts to the orientation of your smart device.
  * 
  *
  * @author:  Edgar Bermejo - @BuiltByEdgar - http://builtbyedgar.com/
@@ -14,9 +14,9 @@
  *
  * @container { DOM Object }
  * @options { Object }:
- * - @strength: Int	(default = 5). How much 3D effect to use (from 0 to 1)
- * - @axis: "x" or "y" or "both". In which axis to apply the "3D" effect
- * - @scope: "global" or "local". From which base coordinate system to calculate 
+ * @power: Float (default = .5). How much 3D effect to use (from 0 to 1)
+ * @axis: "x", "y" or "both". In which axis to apply the "3D" effect
+ * @scope: "global" or "local". From which base coordinate system to calculate 
  * the mouse position and parallax effect
  *
  *
@@ -72,7 +72,7 @@ Parallax.prototype._load = function () {
 	}
 
 
-	this.capture.addEventListener( 'mousemove', this, false );
+	this.capture.addEventListener( 'mousemove', this._mouseMoveHandler.bind( this ), false );
 
 	this.el = document.getElementsByClassName( this.o.className );
 
@@ -91,9 +91,9 @@ Parallax.prototype._load = function () {
 
 
 
-// EVENT HANDLER
+// MOUSEMOVE EVENT HANDLER
 
-Parallax.prototype.handleEvent = function ( event ) { 
+Parallax.prototype._mouseMoveHandler = function ( event ) { 
 
 	this.pointer.x = event.pageX;
 	this.pointer.y = event.pageY;
@@ -103,15 +103,13 @@ Parallax.prototype.handleEvent = function ( event ) {
 
 
 
-// EVENT HANDLER
+// RUN
 
 Parallax.prototype._run = function ( ) { 
 
 
 	var self = this,
 		counter = 1,
-		scrollLeft = ( window.pageXOffset !== undefined ) ? window.pageXOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollLeft,
-		scrollTop = ( window.pageYOffset !== undefined ) ? window.pageYOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollTop,
 		vx = 0, 
 		vy = 0;
 	
