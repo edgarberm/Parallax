@@ -1,5 +1,8 @@
 # Parallax
-Parallax.js is a lightweight and simple parallax effect. Simple to use and works with the mouse, with the scroll and reacts to the orientation of your smart device.
+Parallax.js is a lightweight and simple mouse parallax effect. Simple to use 
+and works with the mouse and soon reacts to the orientation of your smart device.
+
+
 
 
 ##Usage
