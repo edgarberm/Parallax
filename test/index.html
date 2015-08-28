@@ -2,55 +2,36 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Parallax</title>
+	<title>Mouse Parallax</title>
 
 	<style> 
 
 		html, body {
 			margin: 0;
 			padding: 0;
+			width: 100%;
 			height: 100%;
 		}
 
-		body {
-			min-height: 100%;
-			font-family: 'Helvetica Neue', Helvetica, sans-serif;
-		}
-
-		div.parallax-container {
-			position: relative;
-			width: 100%;
-			height: 250px;
-			overflow: hidden;
-			background: #333;
-			top: 20%;
-		}
 		.container {
 			position: absolute;
 			width: 100%;
 			height: 100%;
 			overflow: hidden;
 		}
-		div.parallax-container-images {
+		.parallax-container {
 			width: 100%;
 			height: 100%;
 			-webkit-transform: scale( 1.2 );
 			-moz-transform: scale( 1.2 );
 			-ms-transform: scale( 1.2 );
-			-o-transform: scale( 12 );
+			-o-transform: scale( 1.2 );
 			transform: scale( 1.2 );
 		}
-		.parallax-container-images img {
+		.parallax-container img {
 			display: block;
 			width: auto;
 			height: 110%;
-			-webkit-backface-visibility: hidden;
-			backface-visibility: hidden;
-		}
-		.parallax-container-images img:not(:first-child) {
-			position: absolute;
-			top: 0;
-			left: 0;
 		}
 
 		.parallax {
@@ -63,30 +44,6 @@
 			height: 250px;
 			font-weight: bold;
 		}
-		.parallax1 {
-			color: #fff;
-			opacity: .2;
-			font-size: 150px;
-			line-height: 80%;
-		}
-		.parallax2 {
-			color: #fff;
-			opacity: .4;
-			font-size: 100px;
-			line-height: 320%;
-		}
-		.parallax3 {
-			color: #fff;
-			opacity: .6;
-			font-size: 50px;
-			line-height: 760%;
-		}
-		.parallax4 {
-			color: #fff;
-			opacity: .8;
-			font-size: 40px;
-			line-height: 1080%;
-		}
 	</style>
 
 </head>
@@ -94,13 +51,13 @@
 	
 	<div class="container">
 		
-		<div id="parallax-container" class="parallax-container-images">
+		<div class="parallax-container">
 			<!-- Background -->
-			<img class="parallax" src="img/cd-img-1.jpg" data-power="1" alt="image-1">
+			<img class="parallax" src="img/cd-img-1.jpg" data-power="1" alt="">
 			<!-- Hand -->
-			<img class="parallax" src="img/cd-img-2.png" data-power=".7" alt="image-2">
+			<img class="parallax" src="img/cd-img-2.png" data-power=".6" alt="">
 			<!-- Person -->
-			<img class="parallax" src="img/cd-img-3.png" data-power=".3" alt="image-3">
+			<img class="parallax" src="img/cd-img-3.png" data-power=".3" alt="">
 		</div>
 
 	</div>
@@ -111,7 +68,7 @@
 	<script>
 
 		// Instance Parallax 
-		var parallax = new Parallax( document.getElementById( 'parallax-container' ), {
+		var parallax = new Parallax( document.querySelector( '.parallax-container' ), {
 			className: 'parallax',
 			power: .1,
 			axis: 'both',
