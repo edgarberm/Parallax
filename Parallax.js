@@ -18,8 +18,6 @@
  * - @axis: "x" or "y" or "both". In which axis to apply the "3D" effect
  * - @scope: "global" or "local". From which base coordinate system to calculate 
  * the mouse position and parallax effect
- * - @detect: "mousemove" or "scroll". Either use the mouse position as a reference or the 
- * page scroll position
  *
  *
  **********************************************************************************/
@@ -38,8 +36,7 @@ function Parallax ( container, options ) {
 		className: 'parallax',
 		power: .5,
 		axis: 'x',
-		scope: 'global',
-		detect: 'mousemove'
+		scope: 'global'
 	}
 
 	this._extend( defaults, options );
@@ -49,10 +46,12 @@ function Parallax ( container, options ) {
 	this.capture = null;
 	this.el = [];
 
-	this.raf;
+	this.pointer = { x: 0, y: 0, cx: 0, cy: 0 };
 
-	this.windowHalfWidth = window.innerWidth * .5;
-	this.windowHalfHeight = window.innerHeight * .5;
+	this.transformPrefix = this._getPrefix( [ 'transform', '-ms-transform', '-moz-transform', '-webkit-transform', '-o-transform' ] );
+
+	this.windowWidth = window.innerWidth;
+	this.windowHeight = window.innerHeight;
 
 	window.addEventListener( 'DOMContentLoaded', this._load.bind( this ), false );
 	window.addEventListener( 'resize', this._resize.bind( this ), false );
@@ -66,27 +65,38 @@ function Parallax ( container, options ) {
 
 Parallax.prototype._load = function () {
 
-	if ( this.o.detect === 'scroll' ) {
-		this.capture = window;
-	} else if ( this.o.scope === 'global' ) {
+	if ( this.o.scope === 'global' ) {
 		this.capture = document;
 	} else {
 		this.capture = this.container;
 	}
 
-	this.transformPrefix = this._getPrefix( [ 'transform', '-ms-transform', '-moz-transform', '-webkit-transform', '-o-transform' ] );
 
-	this.capture.addEventListener( this.o.detect, this, false );
-
-	if ( this._isMobile() ) {
-		if ( window.DeviceMotionEvent ) {
-			window.addEventListener( 'ondevicemotion', this );
-		} else {
-			alert( "Sorry, your browser doesn't support Device Orientation" );
-		}
-	}
+	this.capture.addEventListener( 'mousemove', this, false );
 
 	this.el = document.getElementsByClassName( this.o.className );
+
+	window.requestAnimFrame = (function() {
+            return  window.requestAnimationFrame        || // Chromium
+                    window.webkitRequestAnimationFrame  || // WebKit
+                    window.mozRequestAnimationFrame     || // Mozilla
+                    window.oRequestAnimationFrame       || // Opera
+                    window.msRequestAnimationFrame      || // IE
+                    null;
+        })(); 
+
+	this._run();
+
+};
+
+
+
+// EVENT HANDLER
+
+Parallax.prototype.handleEvent = function ( event ) { 
+
+	this.pointer.x = event.pageX;
+	this.pointer.y = event.pageY;
 
 };
 
@@ -95,53 +105,44 @@ Parallax.prototype._load = function () {
 
 // EVENT HANDLER
 
-Parallax.prototype.handleEvent = function ( event ) { 
+Parallax.prototype._run = function ( ) { 
 
-	event.preventDefault();
 
-	var that = this,
+	var self = this,
 		counter = 1,
 		scrollLeft = ( window.pageXOffset !== undefined ) ? window.pageXOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollLeft,
 		scrollTop = ( window.pageYOffset !== undefined ) ? window.pageYOffset : ( document.documentElement || document.body.parentNode || document.body ).scrollTop,
-		axisX = 0, 
-		axisY = 0,
-		rotateX = 0, 
-		rotateY = 0;
+		vx = 0, 
+		vy = 0;
 	
-	if ( this.o.detect === 'scroll' ) {
-		axisX = scrollLeft + window.innerWidth * .5;
-		axisY = scrollTop + window.innerHeight * .5;
-	} else if ( this._isMobile() ) {
-		axisY = event.accelerationIncludingGravity.y * 3;
-		axisX = event.accelerationIncludingGravity.x * 3;
-	} else {
-		axisX = event.pageX;
-		axisY = event.pageY;
-	}
+	
+	this.pointer.cx += ( this.pointer.x - this.pointer.cx ) / 10;
+	this.pointer.cy += ( this.pointer.y - this.pointer.cy ) / 10;
+	vx = -( ( this.windowWidth * .5 ) - Math.max( 15, Math.min( this.pointer.cx, this.windowWidth - 15 ) ) ) * .5;
+	vy = -( ( this.windowHeight * .5 ) - Math.max( 0, Math.min( this.pointer.cy,this.windowHeight - 5 ) ) ) / 4.75;
 	
 	
 	[].forEach.call( this.el, function ( item ) {
 
-		var offsetX = 0, 
-			offsetY = 0,
-			power = item.dataset.power || this.o.power;
+		var ox = 0, 
+			oy = 0,
+			power = ( item.dataset.power || this.o.power ) / 10;
 		
-		if ( that.o.axis === 'x' || that.o.axis === 'both' ) {
-			offsetX = ( axisX - that.container.getBoundingClientRect().left - ( that.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + that.container.getBoundingClientRect().width * .5;
+		if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
+			ox = ( vx - self.container.getBoundingClientRect().left - ( self.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + self.container.getBoundingClientRect().width * .5;
 		} 
 
-		if ( that.o.axis === 'y' || that.o.axis === 'both' ) {
-			offsetY = ( axisY - that.container.getBoundingClientRect().top - ( that.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + that.container.getBoundingClientRect().height * .5;
+		if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
+			oy = ( vy - self.container.getBoundingClientRect().top - ( self.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + self.container.getBoundingClientRect().height * .5;
 		}
-
 		
-		// matrix3d(a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1)
-		// matrix3d( 1,	0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
-		item.style[ that.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + offsetX + ', ' + offsetY + ', 0, 1 )';
+		item.style[ self.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + ox + ', ' + oy + ', 0, 1 )';
 
 		counter ++;
 
 	});
+
+	requestAnimFrame( this._run.bind( this ) );
 
 };
 
@@ -177,8 +178,8 @@ Parallax.prototype._getPrefix = function ( prefixes ) {
 
 Parallax.prototype._resize = function ( event ) {
 	
-	this.windowHalfWidth = window.innerWidth * .5;
-	this.windowHalfHeight = window.innerHeight * .5;
+	this.windowWidth = window.innerWidth;
+	this.windowHeight = window.innerHeight;
 	
 };
 
