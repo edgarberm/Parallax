@@ -7,7 +7,7 @@
  * 
  *
  * @author:  Edgar Bermejo - @BuiltByEdgar - http://builtbyedgar.com/
- * @version: 0.0.1 - Beta (11/07/2015)
+ * @version: 0.1.1 - Beta (29/08/2015)
  * @repository: https://github.com/BuiltByEdgar/Parallax
  * @license: MIT License
  *
