@@ -14,7 +14,7 @@
  *
  * @container { DOM Object }
  * @options { Object }:
- * @power: Float (default = .5). How much 3D effect to use (from 0 to 1)
+ * @power: Float (default = .5). How much 3D effect to use (from 0 to 10)
  * @axis: "x", "y" or "both". In which axis to apply the "3D" effect
  * @scope: "global" or "local". From which base coordinate system to calculate 
  * the mouse position and parallax effect
@@ -65,23 +65,22 @@ function Parallax ( container, options ) {
 
 Parallax.prototype._load = function () {
 
-	if ( this.o.scope === 'global' ) {
+	if ( this.o.scope === 'global' )
 		this.capture = document;
-	} else {
+	else
 		this.capture = this.container;
-	}
 
 
 	this.capture.addEventListener( 'mousemove', this._mouseMoveHandler.bind( this ), false );
 
 	this.el = document.getElementsByClassName( this.o.className );
 
-	window.requestAnimFrame = (function() {
-            return  window.requestAnimationFrame        || // Chromium
-                    window.webkitRequestAnimationFrame  || // WebKit
-                    window.mozRequestAnimationFrame     || // Mozilla
-                    window.oRequestAnimationFrame       || // Opera
-                    window.msRequestAnimationFrame      || // IE
+	window.requestAnimFrame = ( function () {
+            return  window.requestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.oRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
                     null;
         })(); 
 
@@ -109,34 +108,27 @@ Parallax.prototype._run = function ( ) {
 
 
 	var self = this,
-		counter = 1,
 		vx = 0, 
 		vy = 0;
 	
-	
 	this.pointer.cx += ( this.pointer.x - this.pointer.cx ) / 10;
 	this.pointer.cy += ( this.pointer.y - this.pointer.cy ) / 10;
-	vx = -( ( this.windowWidth * .5 ) - Math.max( 15, Math.min( this.pointer.cx, this.windowWidth - 15 ) ) );
-	vy = -( ( this.windowHeight * .5 ) - Math.max( 0, Math.min( this.pointer.cy,this.windowHeight - 5 ) ) );
 	
 	
 	[].forEach.call( this.el, function ( item ) {
 
-		var ox = 0, 
-			oy = 0,
+		var tx = 0, 
+			ty = 0,
 			power = ( item.dataset.power || this.o.power ) / 10;
 		
-		if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
-			ox = ( vx - self.container.getBoundingClientRect().left - ( self.container.getBoundingClientRect().width * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().width * .5 + self.container.getBoundingClientRect().width * .5;
-		} 
+		if ( self.o.axis === 'x' || self.o.axis === 'both' )
+			tx = ( self.pointer.cx - self.windowWidth * .5 ) * -power;
 
-		if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
-			oy = ( vy - self.container.getBoundingClientRect().top - ( self.container.getBoundingClientRect().height * .5 ) ) * power * counter * -1 - item.getBoundingClientRect().height * .5 + self.container.getBoundingClientRect().height * .5;
-		}
+		if ( self.o.axis === 'y' || self.o.axis === 'both' )
+			ty = ( self.pointer.cy - self.windowHeight * .5 ) * -power;
 		
-		item.style[ self.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + ox + ', ' + oy + ', 0, 1 )';
-
-		counter ++;
+		// matrix3d to add 3d rotation
+		item.style[ self.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1 )';
 
 	});
 
@@ -186,11 +178,10 @@ Parallax.prototype._resize = function ( event ) {
 
 Parallax.prototype._isMobile = function ( agent ) {
 
-	if ( navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i) ) {
+	if ( navigator.userAgent.match( /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i ) )
 		return true;
-	} else {
+	else
 		return false;
-	}
 	
 };
 

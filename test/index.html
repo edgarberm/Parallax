@@ -11,6 +11,7 @@
 			padding: 0;
 			width: 100%;
 			height: 100%;
+			background-color: fuchsia;
 		}
 
 		.container {
@@ -22,27 +23,83 @@
 		.parallax-container {
 			width: 100%;
 			height: 100%;
-			-webkit-transform: scale( 1.2 );
-			-moz-transform: scale( 1.2 );
-			-ms-transform: scale( 1.2 );
-			-o-transform: scale( 1.2 );
-			transform: scale( 1.2 );
-		}
-		.parallax-container img {
-			display: block;
-			width: auto;
-			height: 110%;
 		}
 
-		.parallax {
+		.box1 {
 			position: absolute;
-			display: block;
-			top: 0px;
-			left: 0px;
+			width: 20%;
+			height: 20%;
+			background-color: cyan;
+			top: 50%;
+			left: 50%;
+			margin-top: -5%;
+			margin-left: -10%;
+		}
+
+		.box2 {
+			position: absolute;
+			width: 40%;
+			height: 40%;
+			background-color: fuchsia;
+			top: 50%;
+			left: 50%;
+			margin-top: -10%;
+			margin-left: -20%;
+		}
+
+		.box3 {
+			position: absolute;
+			width: 60%;
+			height: 60%;
+			background-color: cyan;
+			top: 50%;
+			left: 50%;
+			margin-top: -15%;
+			margin-left: -30%;
+		}
+
+		.box4 {
+			position: absolute;
+			width: 80%;
+			height: 80%;
+			background-color: fuchsia;
+			top: 50%;
+			left: 50%;
+			margin-top: -20%;
+			margin-left: -40%;
+		}
+
+		.box5 {
+			position: absolute;
 			width: 100%;
-			text-align: center;
-			height: 250px;
-			font-weight: bold;
+			height: 100%;
+			background-color: cyan;
+			top: 50%;
+			left: 50%;
+			margin-top: -25%;
+			margin-left: -50%;
+		}
+
+		.box6 {
+			position: absolute;
+			width: 120%;
+			height: 120%;
+			background-color: fuchsia;
+			top: 50%;
+			left: 50%;
+			margin-top: -30%;
+			margin-left: -60%;
+		}
+
+		.box7 {
+			position: absolute;
+			width: 140%;
+			height: 140%;
+			background-color: cyan;
+			top: 50%;
+			left: 50%;
+			margin-top: -35%;
+			margin-left: -70%;
 		}
 	</style>
 
@@ -52,19 +109,20 @@
 	<div class="container">
 		
 		<div class="parallax-container">
-			<!-- Background -->
-			<img class="parallax" src="img/cd-img-1.jpg" data-power="1" alt="">
-			<!-- Hand -->
-			<img class="parallax" src="img/cd-img-2.png" data-power=".6" alt="">
-			<!-- Person -->
-			<img class="parallax" src="img/cd-img-3.png" data-power=".3" alt="">
+			<div class="parallax box7" data-power="1.4"></div>
+			<div class="parallax box6" data-power="1.2"></div>
+			<div class="parallax box5" data-power="1"></div>
+			<div class="parallax box4" data-power=".8"></div>
+			<div class="parallax box3" data-power=".6"></div>
+			<div class="parallax box2" data-power=".4"></div>
+			<div class="parallax box1" data-power=".2"></div>
 		</div>
 
 	</div>
 
 
 
-	<script src="../parallax.min.js"></script>
+	<script src="../parallax.js"></script>
 	<script>
 
 		// Instance Parallax 
