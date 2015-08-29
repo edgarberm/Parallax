@@ -3,21 +3,22 @@
  * Parallax.js: Mouse parallax effect
  *
  * Parallax.js is a lightweight and simple mouse parallax effect. Simple to use 
- * and works with the mouse and soon reacts to the orientation of your smart device.
+ * and works with the mouse and reacts to the orientation of your smart device.
  * 
  *
  * @author:  Edgar Bermejo - @BuiltByEdgar - http://builtbyedgar.com/
- * @version: 0.1.1 - Beta (29/08/2015)
+ * @version: 0.1.2 - Beta (29/08/2015)
  * @repository: https://github.com/BuiltByEdgar/Parallax
  * @license: MIT License
  *
  *
  * @container { DOM Object }
  * @options { Object }:
- * @power: Float (default = .5). How much 3D effect to use (from 0 to 10)
- * @axis: "x", "y" or "both". In which axis to apply the "3D" effect
+ * @power: Float (default = .5). How much 3D effect to use (from 0 to 10).
+ * @axis: "x", "y" or "both". In which axis to apply the "3D" effect.
+ * @controls: "mouse" or "orientation". Determine which is the event to controll it.
  * @scope: "global" or "local". From which base coordinate system to calculate 
- * the mouse position and parallax effect
+ * the mouse position and parallax effect.
  *
  *
  **********************************************************************************/
@@ -36,6 +37,7 @@ function Parallax ( container, options ) {
 		className: 'parallax',
 		power: .5,
 		axis: 'x',
+		controls: 'mouse',
 		scope: 'global'
 	}
 
@@ -45,8 +47,6 @@ function Parallax ( container, options ) {
 	this.container = container;
 	this.capture = null;
 	this.el = [];
-
-	this.pointer = { x: 0, y: 0, cx: 0, cy: 0 };
 
 	this.transformPrefix = this._getPrefix( [ 'transform', '-ms-transform', '-moz-transform', '-webkit-transform', '-o-transform' ] );
 
@@ -65,13 +65,23 @@ function Parallax ( container, options ) {
 
 Parallax.prototype._load = function () {
 
-	if ( this.o.scope === 'global' )
+	// Check scope
+	if ( this.o.scope === 'global' ) {
 		this.capture = document;
-	else
+	} else {
 		this.capture = this.container;
+	}
 
-
-	this.capture.addEventListener( 'mousemove', this._mouseMoveHandler.bind( this ), false );
+	// Check controlls
+	if ( this.o.controls === 'orientation' || this._isMobile() ) {
+		// TODO:
+		// Calibrate device first
+		this.orientation = { x: 0, y: 0, cx: 0, cy: 0 };
+		window.addEventListener( 'deviceorientation', this._deviceOrientationHandler.bind( this ), false );
+	} else {
+		this.pointer = { x: 0, y: 0, cx: 0, cy: 0 };
+		this.capture.addEventListener( 'mousemove', this._mouseMoveHandler.bind( this ), false );
+	}
 
 	this.el = document.getElementsByClassName( this.o.className );
 
@@ -84,7 +94,20 @@ Parallax.prototype._load = function () {
                     null;
         })(); 
 
+
 	this._run();
+
+};
+
+
+
+// DEVICE ORIENTATION HANDLER
+
+Parallax.prototype._deviceOrientationHandler = function ( event ) { 
+
+	this.orientation.x = ( event.gamma > 2 || event.gamma < -2 ) ? event.gamma : 0;	// left-to-right
+	this.orientation.y = ( event.beta > 2 || event.beta < -2 ) ? event.beta : 0;	// front-to-back
+	// this.orientation.a = event.alpha;	// Compass direction
 
 };
 
@@ -110,27 +133,53 @@ Parallax.prototype._run = function ( ) {
 	var self = this,
 		vx = 0, 
 		vy = 0;
-	
-	this.pointer.cx += ( this.pointer.x - this.pointer.cx ) / 10;
-	this.pointer.cy += ( this.pointer.y - this.pointer.cy ) / 10;
-	
-	
-	[].forEach.call( this.el, function ( item ) {
+
+
+
+	// Faster than forEach
+	for ( var i = 0, l = this.el.length; i < l; i++ ) {
 
 		var tx = 0, 
 			ty = 0,
-			power = ( item.dataset.power || this.o.power ) / 10;
+			item = self.el[ i ],
+			power = ( item.dataset.power || self.o.power ) / 10;
 		
-		if ( self.o.axis === 'x' || self.o.axis === 'both' )
-			tx = ( self.pointer.cx - self.windowWidth * .5 ) * -power;
 
-		if ( self.o.axis === 'y' || self.o.axis === 'both' )
-			ty = ( self.pointer.cy - self.windowHeight * .5 ) * -power;
-		
+		// Check controls
+		if ( self.o.controls === 'orientation' || self._isMobile() ) {
+
+			self.orientation.cx += ( self.orientation.x - self.orientation.cx ) / 10;
+			self.orientation.cy += ( self.orientation.y - self.orientation.cy ) / 10;
+
+			if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
+				tx = self.orientation.cx * 10 * -power;
+			}
+			if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
+				ty = self.orientation.cy * 10 * -power;
+			}
+
+
+		} else {
+			
+			self.pointer.cx += ( self.pointer.x - self.pointer.cx ) / 10;
+			self.pointer.cy += ( self.pointer.y - self.pointer.cy ) / 10;
+			
+			if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
+				tx = ( self.pointer.cx - self.windowWidth * .5 ) * -power;
+			}
+
+			if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
+				ty = ( self.pointer.cy - self.windowHeight * .5 ) * -power;
+			}
+
+		}
+
+		// Fix for Safari for iOS (for now)
+		item.style.webkitTransform = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1 )';
 		// matrix3d to add 3d rotation
 		item.style[ self.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1 )';
 
-	});
+	}
 
 	requestAnimFrame( this._run.bind( this ) );
 
@@ -178,10 +227,11 @@ Parallax.prototype._resize = function ( event ) {
 
 Parallax.prototype._isMobile = function ( agent ) {
 
-	if ( navigator.userAgent.match( /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i ) )
+	if ( navigator.userAgent.match( /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i ) ) {
 		return true;
-	else
+	} else {
 		return false;
+	}
 	
 };
 

@@ -9,9 +9,9 @@ and works with the mouse and soon reacts to the orientation of your smart device
 
 ```html
 <div class="parallax-container">
-	<img class="parallax" src="img/cd-img-1.jpg" data-power="1" alt="">
-	<img class="parallax" src="img/cd-img-2.png" data-power=".6" alt="">
-	<img class="parallax" src="img/cd-img-3.png" data-power=".3" alt="">
+	<div class="parallax box3" data-power="3"></div>
+	<div class="parallax box2" data-power="2"></div>
+	<div class="parallax box1" data-power="1"></div>
 </div>
 ```
 
@@ -20,6 +20,7 @@ var parallax = new Parallax( document.querySelector( '.parallax-container' ), {
 	className: 'parallax',
 	power: .1,
 	axis: 'both',
+	controls: 'mouse',
 	scope: 'global'
 } );
 
