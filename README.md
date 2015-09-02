@@ -9,9 +9,9 @@ and works with the mouse and reacts to the orientation of your smart device.
 
 ```html
 <div class="parallax-container">
-	<div class="parallax box3" data-power="3"></div>
-	<div class="parallax box2" data-power="2"></div>
-	<div class="parallax box1" data-power="1"></div>
+	<div class="parallax" data-power="6"></div>
+	<div class="parallax" data-power="4"></div>
+	<div class="parallax" data-power="2"></div>
 </div>
 ```
 

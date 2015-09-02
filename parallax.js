@@ -50,11 +50,7 @@ function Parallax ( container, options ) {
 
 	this.transformPrefix = this._getPrefix( [ 'transform', '-ms-transform', '-moz-transform', '-webkit-transform', '-o-transform' ] );
 
-	this.windowWidth = window.innerWidth;
-	this.windowHeight = window.innerHeight;
-
 	window.addEventListener( 'DOMContentLoaded', this._load.bind( this ), false );
-	window.addEventListener( 'resize', this._resize.bind( this ), false );
 
 };
 
@@ -67,7 +63,7 @@ Parallax.prototype._load = function () {
 
 	// Check scope
 	if ( this.o.scope === 'global' ) {
-		this.capture = document;
+		this.capture = window;
 	} else {
 		this.capture = this.container;
 	}
@@ -84,6 +80,11 @@ Parallax.prototype._load = function () {
 	}
 
 	this.el = document.getElementsByClassName( this.o.className );
+
+	this.windowWidth = this.capture.innerWidth;
+	this.windowHeight = this.capture.innerHeight;
+
+	window.addEventListener( 'resize', this._resize.bind( this ), false );
 
 	window.requestAnimFrame = ( function () {
             return  window.requestAnimationFrame ||
@@ -212,8 +213,8 @@ Parallax.prototype._getPrefix = function ( prefixes ) {
 
 Parallax.prototype._resize = function ( event ) {
 	
-	this.windowWidth = window.innerWidth;
-	this.windowHeight = window.innerHeight;
+	this.windowWidth = this.capture.innerWidth;
+	this.windowHeight = this.capture.innerHeight;
 	
 };
 
