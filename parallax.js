@@ -14,7 +14,7 @@
  *
  * @container { DOM Object }
  * @options { Object }:
- * @power: Float (default = .5). How much 3D effect to use (from 0 to 10).
+ * @power: Float (default = 5). How much 3D effect to use (from -10 to 10).
  * @axis: "x", "y" or "both". In which axis to apply the "3D" effect.
  * @controls: "mouse" or "orientation". Determine which is the event to controll it.
  * @scope: "global" or "local". From which base coordinate system to calculate 
@@ -76,7 +76,7 @@ Parallax.prototype._load = function () {
 	if ( this.o.controls === 'orientation' || this._isMobile() ) {
 		// TODO:
 		// Calibrate device first
-		this.orientation = { x: 0, y: 0, cx: 0, cy: 0 };
+		this.orientation = { x: 0, y: 0, cx: this.capture.innerWidth * .5, cy: this.capture.innerHeight };
 		window.addEventListener( 'deviceorientation', this._deviceOrientationHandler.bind( this ), false );
 	} else {
 		this.pointer = { x: 0, y: 0, cx: 0, cy: 0 };
@@ -129,55 +129,51 @@ Parallax.prototype._mouseMoveHandler = function ( event ) {
 
 Parallax.prototype._run = function ( ) { 
 
+	// Check controls
+	if ( this.o.controls === 'orientation' || this._isMobile() ) {
+		this.orientation.cx += ( this.orientation.x - this.orientation.cx ) / 10;
+		this.orientation.cy += ( this.orientation.y - this.orientation.cy ) / 10;
+	} else {
+		this.pointer.cx += ( this.pointer.x - this.pointer.cx ) / 10;
+		this.pointer.cy += ( this.pointer.y - this.pointer.cy ) / 10;
+	}
 
-	var self = this,
-		vx = 0, 
-		vy = 0;
 
-
-
-	// Faster than forEach
-	for ( var i = 0, l = this.el.length; i < l; i++ ) {
+	// Loop for is faster than forEach and keep 'this' scope
+	for ( var i = 0, len = this.el.length; i < len; i++ ) {
 
 		var tx = 0, 
 			ty = 0,
-			item = self.el[ i ],
-			power = ( item.dataset.power || self.o.power ) / 10;
+			item = this.el[ i ],
+			power = ( item.dataset.power || this.o.power ) / 10;
 		
 
 		// Check controls
-		if ( self.o.controls === 'orientation' || self._isMobile() ) {
+		if ( this.o.controls === 'orientation' || this._isMobile() ) {
 
-			self.orientation.cx += ( self.orientation.x - self.orientation.cx ) / 10;
-			self.orientation.cy += ( self.orientation.y - self.orientation.cy ) / 10;
-
-			if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
-				tx = self.orientation.cx * 10 * -power;
+			if ( this.o.axis === 'x' || this.o.axis === 'both' ) {
+				tx = this.orientation.cx * 10 * -power;
 			}
-			if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
-				ty = self.orientation.cy * 10 * -power;
+			if ( this.o.axis === 'y' || this.o.axis === 'both' ) {
+				ty = this.orientation.cy * 10 * -power;
 			}
 
 
 		} else {
-			
-			self.pointer.cx += ( self.pointer.x - self.pointer.cx ) / 10;
-			self.pointer.cy += ( self.pointer.y - self.pointer.cy ) / 10;
-			
-			if ( self.o.axis === 'x' || self.o.axis === 'both' ) {
-				tx = ( self.pointer.cx - self.windowWidth * .5 ) * -power;
+						
+			if ( this.o.axis === 'x' || this.o.axis === 'both' ) {
+				tx = ( this.pointer.cx - this.windowWidth * .5 ) * -power;
 			}
 
-			if ( self.o.axis === 'y' || self.o.axis === 'both' ) {
-				ty = ( self.pointer.cy - self.windowHeight * .5 ) * -power;
+			if ( this.o.axis === 'y' || this.o.axis === 'both' ) {
+				ty = ( this.pointer.cy - this.windowHeight * .5 ) * -power;
 			}
 
 		}
-
+		
+		// matrix3d to add 3d rotation soon
 		// Fix for Safari for iOS (for now)
-		item.style.webkitTransform = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1 )';
-		// matrix3d to add 3d rotation
-		item.style[ self.transformPrefix ] = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1 )';
+		item.style[ this.transformPrefix ] = item.style.webkitTransform = 'matrix3d( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + tx + ', ' + ty + ', 0, 1)';
 
 	}
 
@@ -209,7 +205,6 @@ Parallax.prototype._getPrefix = function ( prefixes ) {
 	return result;
 
 };
-
 
 
 
