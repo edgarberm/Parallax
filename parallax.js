@@ -63,9 +63,13 @@ Parallax.prototype._load = function () {
 
 	// Check scope
 	if ( this.o.scope === 'global' ) {
-		this.capture = window;
+    this.capture = window;
+    this.windowWidth = this.capture.innerWidth;
+    this.windowHeight = this.capture.innerHeight;
 	} else {
-		this.capture = this.container;
+    this.capture = this.container;
+    this.windowWidth = this.capture.getBoundingClientRect().width;
+    this.windowHeight = this.capture.getBoundingClientRect().height;
 	}
 
 	// Check controlls
