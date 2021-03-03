@@ -232,3 +232,5 @@ Parallax.prototype._extend = function (opt, src) {
 
   return opt;
 };
+
+export default Parallax;
